@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+  function refresh() {
+    $.get("/wishlist/json", function(data) {
+      $("#table").html("")
+          for(let i = 0; i < data.length ; i++){
+            $("#table").append(`<tr>
+  <td>${data[i].fields.nama_barang}</td>
+  <td>${data[i].fields.harga_barang}</td>
+  <td>${data[i].fields.deskripsi}</td>
+</tr>`)
+          }
+
+          
+        });
+  }
+    $(document).ready(function(){
+        b();
+    });
+
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    function post(){
+      $.ajax({
+        url: "/wishlist/ajax/",
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken")
+        },
+        data:{
+          judul : $('#judul').val(),
+        description : $("#description").val(),
+        harga : $("#harga").val(),
+        },
+      success: function(){
+        refresh();
+      },
+      error: function(){
+        aler("error");
+      }
+    })}
+    
+    </script>
+{% endblock meta %}
+
+{% block content %}
+
+{% load static %}
+
+<nav class="navbar navbar-dark bg-dark">
+    <p class="text-light">{{nama}}</p>
+    <button><a href="{% url 'wishlist:logout' %}">Logout</a></button>
+  </nav>
+
+  <div id="wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Nama Barang</th>
+          <th scope="col">Harga Barang</th>
+          <th scope="col">Deskripsi</th>
+        </tr>
+      </thead>
+      <tbody id="table">
+          
+      </tbody>
+    </table>
+  
+    <form method="POST" action="">
+
+        {% csrf_token %}
+        <div class = "create-task">
+        <link rel="stylesheet" href="{% static 'css/bootstrap-create-task.css' %}"/>
+        <h1 style = "background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%); text-align: center; color: rgb(211, 134, 18)">New Task</h1>
+        <body>
+            <form>
+                <div class="form-group">
+                  <label style = "color: #ffff">Title</label>
+                  <input type="text" name="title" placeholder="Title" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label style = "color: #ffff">Harga</label>
+                    <input type="text" name="description" placeholder="Harga" class="form-control">
+                  </div>
+                <div class="form-group">
+                  <label style = "color: #ffff">Harga</label>
+                  <input type="text" name="description" placeholder="Deskripsi" class="form-control">
+                </div>
+                <input class="btn login_btn" type="submit" value="Submit" href="{% url 'wishlist:show_todolist' %}">
+                <ul>
+                  <a href="{% url 'todolist:show_todolist' %}">Kembali</a>
+                </ul>
+            </form>
+        </body>
+        </div>   
+    </form>
+
+
+<h5>Sesi terakhir login: {{ last_login }}</h5>
+
+{% endblock content %}
